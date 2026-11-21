@@ -1,0 +1,40 @@
+import type { EncounterDef, EnemyDef } from '../core/types';
+
+export const ENEMIES: Record<string, EnemyDef> = {
+  liuhong: { id: 'liuhong', name: '刘洪', emoji: '🗡️', race: '人', hp: [16, 18], pattern: 'fixed',
+    moves: [{ name: '劈砍', kind: 'attack', dmg: 5 }, { name: '持盾', kind: 'block', block: 5 }, { name: '狠刺', kind: 'attack', dmg: 7 }] },
+  xiaoyaoDao: { id: 'xiaoyaoDao', name: '小妖·刀', emoji: '👺', race: '妖', hp: [18, 22], pattern: 'cycle',
+    moves: [{ name: '乱砍', kind: 'attack', dmg: 7 }, { name: '连斩', kind: 'attack', dmg: 3, times: 2 }, { name: '叫阵', kind: 'buff', strength: 1 }] },
+  xiaoyaoDun: { id: 'xiaoyaoDun', name: '小妖·盾', emoji: '🛡️', race: '妖', hp: [20, 24], pattern: 'cycle',
+    moves: [{ name: '盾撞', kind: 'attackBlock', dmg: 5, block: 6 }, { name: '猛击', kind: 'attack', dmg: 8 }] },
+  huJing: { id: 'huJing', name: '虎精', emoji: '🐅', race: '妖', hp: [32, 34], pattern: 'fixed',
+    moves: [{ name: '扑抓', kind: 'attack', dmg: 7 }, { name: '咆哮', kind: 'buff', strength: 2 }, { name: '扑噬', kind: 'attack', dmg: 11 },
+      { name: '跃袭后排', kind: 'attackBack', dmg: 6 }] },
+  yinJiangjun: { id: 'yinJiangjun', name: '寅将军', emoji: '🐯', race: '妖', hp: [28, 30], pattern: 'fixed',
+    moves: [{ name: '虎爪', kind: 'attack', dmg: 7 }, { name: '双扑', kind: 'attack', dmg: 4, times: 2 }, { name: '掳人', kind: 'attackBack', dmg: 6 }] },
+  xiongShanjun: { id: 'xiongShanjun', name: '熊山君', emoji: '🐻', race: '妖', hp: [24, 26], pattern: 'fixed',
+    moves: [{ name: '熊皮厚', kind: 'block', block: 8 }, { name: '熊掌', kind: 'attack', dmg: 6 }, { name: '撼地', kind: 'aoe', dmg: 3 }] },
+  shankou: { id: 'shankou', name: '山寇', emoji: '🥷', race: '人', hp: [15, 17], pattern: 'cycle',
+    moves: [{ name: '劫道', kind: 'attack', dmg: 5 }, { name: '藏身', kind: 'attackBlock', dmg: 3, block: 4 }] },
+  xinyuan: { id: 'xinyuan', name: '心猿未驯', emoji: '👹', race: '妖', hp: [48, 48], pattern: 'fixed', boss: true,
+    moves: [{ name: '山中业障', kind: 'attack', dmg: 9 }, { name: '狂性', kind: 'buff', strength: 2 }, { name: '乱棍', kind: 'attack', dmg: 4, times: 2 },
+      { name: '金箍未驯', kind: 'attackBlock', dmg: 6, block: 8 }, { name: '冲撞经主', kind: 'attackBack', dmg: 7 }] },
+  xiaolong: { id: 'xiaolong', name: '鹰愁涧小龙', emoji: '🐲', race: '龙', hp: [50, 50], pattern: 'fixed', dragonScale: true, boss: true,
+    moves: [{ name: '龙咬', kind: 'attack', dmg: 9 }, { name: '掀浪', kind: 'aoe', dmg: 4 }, { name: '盘涧', kind: 'block', block: 8 },
+      { name: '吞马之势', kind: 'attack', dmg: 12 }] },
+  shuiguai: { id: 'shuiguai', name: '涧中水怪', emoji: '🦐', race: '妖', hp: [26, 28], pattern: 'cycle',
+    moves: [{ name: '水箭', kind: 'attack', dmg: 6 }, { name: '浪头', kind: 'aoe', dmg: 3 }, { name: '缩壳', kind: 'attackBlock', dmg: 3, block: 5 }] },
+};
+
+export const ENCOUNTERS: Record<string, EncounterDef> = {
+  liuhong: { id: 'liuhong', name: '寻亲报冤 · 刘洪', enemies: ['liuhong'], tier: 'normal' },
+  hu: { id: 'hu', name: '出城逢虎 · 虎精', enemies: ['huJing'], tier: 'ordeal' },
+  zhecong: { id: 'zhecong', name: '折从落坑', enemies: ['yinJiangjun', 'xiongShanjun'], tier: 'ordeal', script: 'loseRetainer' },
+  shankou: { id: 'shankou', name: '双叉岭 · 山寇', enemies: ['shankou', 'shankou'], tier: 'ordeal', scaleByParty: true },
+  road_dao: { id: 'road_dao', name: '路遇小妖', enemies: ['xiaoyaoDao'], tier: 'normal', scaleByParty: true },
+  road_pair: { id: 'road_pair', name: '刀盾小妖', enemies: ['xiaoyaoDao', 'xiaoyaoDun'], tier: 'normal', scaleByParty: true },
+  road_dun: { id: 'road_dun', name: '拦路盾妖', enemies: ['xiaoyaoDun'], tier: 'normal', scaleByParty: true },
+  xinyuan: { id: 'xinyuan', name: '两界山头 · 心猿未驯', enemies: ['xinyuan'], tier: 'boss' },
+  xiaolong: { id: 'xiaolong', name: '陡涧换马 · 小龙', enemies: ['xiaolong'], tier: 'boss' },
+  shuiguai: { id: 'shuiguai', name: '陡涧换马 · 涧中水怪', enemies: ['shuiguai', 'shuiguai'], tier: 'boss' },
+};
