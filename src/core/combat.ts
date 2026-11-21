@@ -592,7 +592,7 @@ function resolveEffects(run: RunState, f: Fighter, card: CardInst, effects: Effe
   }
 }
 
-function attackBonus(run: RunState, f: Fighter, card: CardInst): number {
+export function attackBonus(run: RunState, f: Fighter, card: CardInst): number {
   const d = cardDef(card);
   if (d.type !== 'attack') return 0;
   let n = f.yaoqi + f.turnAtkBonus;
