@@ -38,6 +38,10 @@ scripts/    playthrough.mjs（整章 e2e + 截图）、death-check.mjs（死亡�
 
 移植小游戏时只需替换 `src/ui/`（改为 Canvas 渲染）并把 `save.ts` 的 KV 换成 `wx.getStorageSync / wx.setStorageSync`；`core` 与 `data` 不依赖浏览器 API。
 
+## 发布试玩
+
+试玩：https://muhuo7510-ux.github.io/xiyou-roguelike-card/ （GitHub Pages，来源 gh-pages 分支）。改完代码运行 `npm run deploy` 重新发布。`docs/pages-workflow.yml.example` 是备用的 Actions 部署配置（gh 令牌需有 workflow 权限才能推送）。
+
 ## 已知简化
 
 见提交说明与 docs；主要有：卡面数值不随法宝变化（战斗中额外加成以红字「伤害 +N」提示）、禅定/行路的弃牌为随机、筋斗云不含换位、紧箍咒只做「攻击 +3」（升级后加「下一张 0 费」）、破隐对全队生效、未做战斗内换位与激活名单手动选择界面（第一章同时最多 2 名弟子，用不到）。
