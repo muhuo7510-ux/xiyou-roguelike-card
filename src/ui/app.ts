@@ -3,13 +3,13 @@ import { CHARS } from '../data/characters';
 import { CHAPTER1 } from '../data/chapter1';
 import { ENCOUNTERS } from '../data/enemies';
 import { POTIONS, RELICS } from '../data/relics';
-import { canUpgrade, cardDef } from '../core/cards';
+import { canUpgrade, cardDef, cardFace } from '../core/cards';
 import * as C from '../core/combat';
 import * as R from '../core/run';
 import * as S from '../core/save';
 import type { MetaState, RunState } from '../core/state';
 import type { CharId } from '../core/types';
-import { cardHTML, enemyHTML, esc, fighterHTML, hpBar, memberChip, potionsHTML, relicsHTML } from './views';
+import { cardHTML, esc, enemyHTML, fighterHTML, hpBar, memberChip, potionsHTML, relicsHTML } from './views';
 
 const kv: S.KV = {
   get: (k) => localStorage.getItem(k),
@@ -23,6 +23,7 @@ interface UI {
   potionSel: number | null; // 等待选目标的丹药
   deck: CharId | null; // 查看牌库
   tip: string | null;
+  upgradeUid: number | null; // 升级对比：已点选但尚未确认的牌
   carryRelic: string | null;
   carryCards: number[];
 }
@@ -30,12 +31,31 @@ interface UI {
 let root: HTMLElement;
 let run: RunState | null = null;
 let meta: MetaState = S.loadMeta(kv);
-const ui: UI = { view: 'title', sel: null, potionSel: null, deck: null, tip: null, carryRelic: null, carryCards: [] };
+const ui: UI = { view: 'title', sel: null, potionSel: null, deck: null, tip: null, upgradeUid: null, carryRelic: null, carryCards: [] };
 
 export function mountApp(el: HTMLElement) {
   root = el;
   root.addEventListener('click', onClick);
-  (window as unknown as { __xy: unknown }).__xy = { get run() { return run; }, get meta() { return meta; }, get ui() { return ui; } };
+  let pressTimer: number | null = null;
+  const clearPress = () => {
+    if (pressTimer != null) {
+      window.clearTimeout(pressTimer);
+      pressTimer = null;
+    }
+  };
+  root.addEventListener('pointerdown', (ev) => {
+    const kw = (ev.target as HTMLElement).closest('.kw') as HTMLElement | null;
+    if (!kw) return;
+    clearPress();
+    pressTimer = window.setTimeout(() => {
+      pressTimer = null;
+      ui.tip = kw.dataset.tip ?? null;
+      render();
+    }, 450);
+  });
+  root.addEventListener('pointerup', clearPress);
+  root.addEventListener('pointercancel', clearPress);
+  (window as unknown as { __xy: unknown }).__xy = { get run() { return run; }, get meta() { return meta; }, get ui() { return ui; }, render };
   const q = new URLSearchParams(location.search);
   if (q.get('seed')) {
     startNew(Number(q.get('seed')));
@@ -54,6 +74,7 @@ function startNew(seed = (Date.now() % 1e9) | 0) {
 function resetSel() {
   ui.sel = null;
   ui.potionSel = null;
+  ui.upgradeUid = null;
 }
 
 /** 每次操作后：自动补选、存档、重绘 */
@@ -122,8 +143,22 @@ function onClick(ev: Event) {
     // 待选弹窗
     case 'pdWho': R.resolvePending(run!, { who: d.who as CharId }); break;
     case 'pdCard': R.resolvePending(run!, { cardIdx: Number(d.idx) }); break;
-    case 'pdUid': R.resolvePending(run!, { uid: Number(d.uid) }); break;
-    case 'pdSkip': R.resolvePending(run!, { skip: true }); break;
+    case 'pdUid':
+      if (run!.pending[0]?.kind === 'upgrade') {
+        ui.upgradeUid = Number(d.uid);
+        break;
+      }
+      R.resolvePending(run!, { uid: Number(d.uid) });
+      break;
+    case 'pdSkip': ui.upgradeUid = null; R.resolvePending(run!, { skip: true }); break;
+    case 'upConfirm':
+      if (ui.upgradeUid != null) {
+        const uid = ui.upgradeUid;
+        ui.upgradeUid = null;
+        R.resolvePending(run!, { uid });
+      }
+      break;
+    case 'upCancel': ui.upgradeUid = null; break;
     // 结算
     case 'retry': S.clearRun(kv); startNew(); return;
     case 'carryRelic': ui.carryRelic = ui.carryRelic === d.id ? null : d.id!; break;
@@ -251,6 +286,8 @@ function helpView() {
     <li>弟子倒下本场冻结，胜后 30% 生命站起。唐僧生命归零则<b>被劫</b>：3 回合内取胜才能救回，否则本章失败。</li>
     <li>战后选卡：先指定给谁，再从他的牌池 3 选 1。Boss 给两次，须分给不同角色。</li>
     <li>难 8 揭帖收悟空（唐僧牌库加入紧箍咒），难 9 鹰愁涧收白龙马。</li>
+    <li>升级时会弹出「升级前 / 升级后」对比，数字变绿处即强化，确认后才生效。已升级的牌带「+」和绿边。</li>
+    <li>卡面上带下划虚线的词（如净化、诅咒、消耗、护甲）可点按或悬停查看说明。</li>
   </ul><button class="btn primary" data-act="title">返回</button></div>`;
 }
 
@@ -483,13 +520,38 @@ function pendingView(run: RunState) {
       const cards = m.deck.map((c) => {
         const curse = cardDef(c).rarity === 'curse';
         const ok = p.kind === 'upgrade' ? canUpgrade(c) : run.gold >= p.price + (curse ? 50 : 0) && (m.deck.length > 4 || curse);
-        return cardHTML(c, { playable: ok, act: ok ? 'pdUid' : undefined, attrs: `data-uid="${c.uid}"`, price: p.kind === 'remove' ? p.price + (curse ? 50 : 0) : undefined });
+        return cardHTML(c, { playable: ok, selected: p.kind === 'upgrade' && ui.upgradeUid === c.uid, act: ok ? 'pdUid' : undefined, attrs: `data-uid="${c.uid}"`, price: p.kind === 'remove' ? p.price + (curse ? 50 : 0) : undefined });
       }).join('');
-      inner = `<h3>${title} · ${CHARS[p.who].name}</h3>${p.kind === 'remove' ? `<p class="small">牌库至少保留 4 张。持有 💰${run.gold}</p>` : ''}<div class="cards">${cards}</div>
+      inner = `<h3>${title} · ${CHARS[p.who].name}</h3>${p.kind === 'remove' ? `<p class="small">牌库至少保留 4 张。持有 💰${run.gold}</p>` : p.kind === 'upgrade' ? '<p class="small">点一张牌，先看升级前后对比，再确认。</p>' : ''}<div class="cards">${cards}</div>
         <button class="btn ghost" data-act="pdSkip">${p.kind === 'upgrade' ? '放弃升级' : '取消'}</button>`;
     }
   }
-  return `<div class="overlay"><div class="panel">${inner}</div></div>`;
+  const cmp = p.kind === 'upgrade' && ui.upgradeUid != null ? upgradeCompareView(run, ui.upgradeUid) : '';
+  return `<div class="overlay"><div class="panel">${inner}</div></div>${cmp}`;
+}
+
+function upgradeCompareView(run: RunState, uid: number): string {
+  const p = run.pending[0];
+  if (p.kind !== 'upgrade' || !p.who) return '';
+  const card = R.member(run, p.who)?.deck.find((c) => c.uid === uid);
+  if (!card || !canUpgrade(card)) return '';
+  const before = { ...card, up: false };
+  const after = { ...card, up: true };
+  const costNote = cardFace(before).cost !== cardFace(after).cost
+    ? `<p class="small cost-note">费用 ${cardFace(before).cost} → <span class="diff">${cardFace(after).cost}</span></p>`
+    : '';
+  return `<div class="overlay cmp-overlay"><div class="panel cmp-panel">
+    <h3>升级对比</h3>
+    <div class="cmp">
+      <div class="cmp-col"><div class="cmp-lbl">升级前</div>${cardHTML(before, { static: true })}</div>
+      <div class="cmp-arrow" aria-hidden="true">→</div>
+      <div class="cmp-col"><div class="cmp-lbl after">升级后</div>${cardHTML(after, { static: true, diffFrom: before })}</div>
+    </div>
+    ${costNote}
+    <p class="small">绿色数字/文字是这次强化的变化。</p>
+    <button class="btn primary" data-act="upConfirm">确认升级</button>
+    <button class="btn ghost" data-act="upCancel">取消</button>
+  </div></div>`;
 }
 
 function deckView(run: RunState, who: CharId) {

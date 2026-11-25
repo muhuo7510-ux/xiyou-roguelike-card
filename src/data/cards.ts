@@ -11,8 +11,8 @@ c({ id: 'xizhang', name: '锡杖轻叩', owner: 'tang', type: 'attack', rarity: 
   desc: '造成 4 点伤害。', effects: [{ op: 'damage', n: 4 }],
   up: { desc: '造成 7 点伤害。', effects: [{ op: 'damage', n: 7 }] } });
 c({ id: 'songjing', name: '诵经', owner: 'tang', type: 'skill', rarity: 'basic', target: 'none', cost: 1,
-  desc: '获得 5 点护甲。若在后排，净化自己 1 层负面。', effects: [{ op: 'block', n: 5, to: 'self' }, { op: 'cleanse', onlyBack: true }],
-  up: { desc: '获得 8 点护甲。若在后排，净化自己 1 层负面。', effects: [{ op: 'block', n: 8, to: 'self' }, { op: 'cleanse', onlyBack: true }] } });
+  desc: '获得 5 点护甲。若在后排，移除手中 1 张诅咒（或净化 1 层负面）。', effects: [{ op: 'block', n: 5, to: 'self' }, { op: 'cleanse', onlyBack: true }],
+  up: { desc: '获得 8 点护甲。若在后排，移除手中 1 张诅咒（或净化 1 层负面）。', effects: [{ op: 'block', n: 8, to: 'self' }, { op: 'cleanse', onlyBack: true }] } });
 c({ id: 'zhixin', name: '志心', owner: 'tang', type: 'skill', rarity: 'basic', target: 'none', cost: 1,
   desc: '获得 4 点护甲，抽 1 张牌。', effects: [{ op: 'block', n: 4, to: 'self' }, { op: 'draw', n: 1 }],
   up: { desc: '获得 7 点护甲，抽 1 张牌。', effects: [{ op: 'block', n: 7, to: 'self' }, { op: 'draw', n: 1 }] } });
@@ -38,8 +38,8 @@ c({ id: 'fazhi', name: '锡杖法旨', owner: 'tang', type: 'attack', rarity: 'c
   desc: '造成 7 点伤害，对妖族 +3。', effects: [{ op: 'damage', n: 7, vsRace: '妖', vsBonus: 3 }],
   up: { desc: '造成 10 点伤害，对妖族 +3。', effects: [{ op: 'damage', n: 10, vsRace: '妖', vsBonus: 3 }] } });
 c({ id: 'qingxin', name: '清心', owner: 'tang', type: 'skill', rarity: 'rare', target: 'none', cost: 1,
-  desc: '净化 1 层负面，获得 4 点护甲，抽 1 张牌。', effects: [{ op: 'cleanse' }, { op: 'block', n: 4, to: 'self' }, { op: 'draw', n: 1 }],
-  up: { desc: '净化 1 层负面，获得 7 点护甲，抽 1 张牌。', effects: [{ op: 'cleanse' }, { op: 'block', n: 7, to: 'self' }, { op: 'draw', n: 1 }] } });
+  desc: '移除手中 1 张诅咒（或净化 1 层负面），获得 4 点护甲，抽 1 张牌。', effects: [{ op: 'cleanse' }, { op: 'block', n: 4, to: 'self' }, { op: 'draw', n: 1 }],
+  up: { desc: '移除手中 1 张诅咒（或净化 1 层负面），获得 7 点护甲，抽 1 张牌。', effects: [{ op: 'cleanse' }, { op: 'block', n: 7, to: 'self' }, { op: 'draw', n: 1 }] } });
 c({ id: 'bianzhe', name: '贬谪', owner: 'curse', type: 'curse', rarity: 'curse', target: 'none', cost: 0, unplayable: true, onDrawLoseHp: 2,
   desc: '诅咒。不能打出。抽到时唐僧失去 2 点生命。', effects: [] });
 

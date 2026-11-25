@@ -44,6 +44,7 @@ while (actions++ < 3000) {
   if (st.screen === 'title') { await click('[data-act=new]'); continue; }
   if (await exists('.overlay [data-act=pdWho]')) { await page.locator('.overlay [data-act=pdWho]').last().click(); continue; }
   if (await exists('.overlay [data-act=pdCard]')) { await click('.overlay [data-act=pdCard]'); continue; }
+  if (await exists('[data-act=upConfirm]')) { await click('[data-act=upConfirm]'); continue; }
   if (await exists('.overlay [data-act=pdUid]')) { await click('.overlay [data-act=pdUid]'); continue; }
   if (await exists('.overlay [data-act=pdSkip]')) { await click('.overlay [data-act=pdSkip]'); continue; }
 

@@ -150,7 +150,22 @@ h3 { font-size: 14px; color: var(--jade); margin-top: 12px; }
 .card.t-curse { border-color: #4b3b5c; background: #e5dcec; }
 .card.r-uncommon .cname { color: var(--sky); }
 .card.r-rare .cname { color: #a3780d; }
-.card.up { background: #f7fbef; }
+.card.up {
+  background: linear-gradient(180deg, #f3fbe8, #e5f3d0);
+  border-color: #2f7a3a;
+  border-width: 3px;
+  box-shadow: 0 0 0 2px #b7e08a, 0 0 12px #6db15a88, 0 3px 0 #0002;
+}
+.card.up .cname { color: #1d6b32; }
+.card .plus { color: #1a7a32; font-size: 15px; font-weight: 800; margin-left: 1px; }
+.card .up-badge {
+  position: absolute; top: -1px; right: -1px;
+  background: #2f7a3a; color: #fff; font-size: 9px; line-height: 1.4;
+  padding: 1px 5px; border-radius: 0 8px 0 8px; letter-spacing: 0;
+}
+.card.static { cursor: default; }
+.card.static:hover { transform: none; }
+.card .cost.changed { background: #1a7a32; box-shadow: 0 0 0 2px #c6e6a8; }
 .card.dim { opacity: .45; }
 .card.sel { transform: translateY(-8px); box-shadow: 0 0 0 3px var(--gold), 0 6px 10px #0003; }
 .card.sold { opacity: .3; }
@@ -183,3 +198,64 @@ div.ritem.done { color: var(--jade); }
 }
 
 .card .bonus { display: block; color: var(--red); font-size: 10px; margin-top: 2px; }
+
+/* 关键词：悬停或点按看说明 */
+.kw {
+  border-bottom: 1px dashed var(--jade);
+  color: var(--jade);
+  cursor: help;
+  position: relative;
+}
+@media (hover: hover) and (pointer: fine) {
+  .kw:hover::after, .kw:focus-visible::after {
+    content: attr(data-tip);
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 6px);
+    transform: translateX(-50%);
+    width: max-content;
+    max-width: 220px;
+    background: var(--dai);
+    color: #f3e9d2;
+    font-size: 11px;
+    font-weight: normal;
+    line-height: 1.45;
+    padding: 6px 8px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px #0005;
+    z-index: 60;
+    white-space: pre-wrap;
+    pointer-events: none;
+  }
+}
+
+/* 升级对比层 */
+.cmp-overlay { z-index: 40; }
+.cmp-panel { max-width: 100%; }
+.cmp {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 4px;
+  margin: 8px 0 10px;
+}
+.cmp-col { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; }
+.cmp-lbl { font-size: 12px; color: var(--muted); margin-bottom: 10px; letter-spacing: 1px; }
+.cmp-lbl.after { color: #1d6b32; font-weight: bold; }
+.cmp-arrow { align-self: center; font-size: 22px; color: var(--jade); padding: 0 2px; margin-top: 18px; }
+.cmp .card {
+  width: 100%;
+  max-width: 168px;
+  min-width: 0;
+  height: 210px;
+  padding: 10px 8px 6px;
+}
+.cmp .card .cname { font-size: 15px; }
+.cmp .card .cdesc { font-size: 12.5px; line-height: 1.45; overflow: visible; }
+.diff { color: #146628; font-weight: 800; background: #c8efb8; border-radius: 3px; padding: 0 2px; }
+.cost-note { text-align: center; }
+
+@media (max-width: 380px) {
+  .cmp .card { height: 230px; }
+  .cmp .card .cdesc { font-size: 12px; }
+}
